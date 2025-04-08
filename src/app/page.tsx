@@ -9,16 +9,13 @@ import { buscarApisDestaque } from '@/services/apiService'
 
 function Loading() {
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      <div className="h-2 bg-gray-200 rounded-full overflow-hidden relative">
-        <div 
-          className="h-full w-full bg-[#6a1b9a] absolute animate-[loading_5s_ease-in-out_infinite]"
-          style={{
-            animation: 'loading 5s ease-in-out infinite'
-          }}
+    <div className="w-full max-w-3xl mx-auto p-8">
+      <div className="h-4 bg-gray-200 rounded-full overflow-hidden relative">
+        <div
+          className="loading-bar h-full w-full bg-[#6a1b9a] absolute"
         />
       </div>
-      <p className="text-center mt-4 text-[#666] animate-[pulse_2s_ease-in-out_infinite]">
+      <p className="text-center mt-4 text-[#666] loading-text">
         Carregando APIs...
       </p>
     </div>
@@ -26,6 +23,9 @@ function Loading() {
 }
 
 async function ListaApis() {
+  // Add artificial delay
+  await new Promise(resolve => setTimeout(resolve, 5000));
+  
   const resultado = await buscarApisDestaque()
   
   return (
@@ -62,7 +62,7 @@ export default function Home() {
         <Suspense fallback={<Loading />}>
           <ListaApis />
         </Suspense>
-        
+
         <div className="mt-16 max-w-2xl mx-auto">
           <FormularioApi />
         </div>
