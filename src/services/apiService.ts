@@ -3,13 +3,15 @@
 import conectarDB from '@/lib/mongodb'
 import CustomApi from '@/models/CustomApi'
 
+// Corrigir a URL base para o endpoint correto
 const API_BASE_URL = 'https://ch-api-production.up.railway.app'
 
+// Função para buscar APIs em destaque
 export async function buscarApisDestaque() {
   try {
     let apisExternas = []
     try {
-      const response = await fetch(`${API_BASE_URL}/apis`, {
+      const response = await fetch(`${API_BASE_URL}/api/apis`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -37,10 +39,15 @@ export async function buscarApisDestaque() {
       console.error('Erro ao buscar APIs customizadas:', error)
     }
 
+    // Retornar as APIs externas primeiro, seguidas pelas APIs customizadas
     return {
       success: true,
       data: [
-        ...apisExternas,
+        ...apisExternas.map(api => ({
+          api_name: api.api_name,
+          api_description: api.api_description,
+          is_custom: false
+        })),
         ...apisCustomizadas.map(api => ({
           id: api._id.toString(),
           api_name: api.api_name,
