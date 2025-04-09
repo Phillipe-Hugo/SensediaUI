@@ -10,20 +10,24 @@ export async function buscarApisDestaque() {
     await conectarDB()
     const apisCustomizadas = await CustomApi.find().lean()
 
-    // Depois busca as APIs externas
-    const resposta = await fetch('https://ch-api-production.up.railway.app/api/apis', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-      cache: 'no-store'
-    })
+    let apisExternas = []
+    try {
+      // Tenta buscar APIs externas
+      const resposta = await fetch('https://ch-api-production.up.railway.app/api/apis', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+        next: { revalidate: 60 } // Cache por 1 minuto
+      })
 
-    if (!resposta.ok) {
-      throw new Error('Falha ao carregar APIs externas')
+      if (resposta.ok) {
+        apisExternas = await resposta.json()
+      }
+    } catch (erroExterno) {
+      console.warn('Falha ao carregar APIs externas:', erroExterno)
+      // Continua com as APIs locais mesmo se as externas falharem
     }
-
-    const apisExternas = await resposta.json()
 
     // Combina as duas fontes de dados
     const todasApis = [
