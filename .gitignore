@@ -41,3 +41,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Cache
+.cache
+
+# IDE/Editor
+.idea
+.vscode
+*.swp
+*.swo
