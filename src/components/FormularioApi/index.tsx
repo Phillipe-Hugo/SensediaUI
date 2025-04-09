@@ -10,34 +10,37 @@ export default function FormularioApi() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function enviarFormulario(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
+    setCarregando(true)
 
     try {
       const resultado = await adicionarApiCustomizada({
-        api_name: nome,
-        api_description: descricao
+        nome_api: nome,
+        descricao_api: descricao
       })
 
-      if (resultado.success) {
+      if (resultado.sucesso) {
         setNome('')
         setDescricao('')
         window.alert('API criada com sucesso!')
-        // Atualização mais eficiente
-        router.refresh()
+        // Forçar atualização da lista
+        window.location.reload()
       } else {
-        window.alert('Erro ao criar API. Tente novamente.')
+        throw new Error(resultado.mensagemErro || 'Falha ao criar API')
       }
+    } catch (erro) {
+      console.error('Erro no formulário:', erro)
+      window.alert(erro.message || 'Erro ao conectar com o servidor')
     } finally {
-      setLoading(false)
+      setCarregando(false)
     }
   }
 
   return (
     <div className="bg-gray-100 p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-[#6a1b9a]">Adicionar Nova API</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={enviarFormulario} className="space-y-4">
         <div>
           <label className="block text-[#666] mb-2">Nome da API</label>
           <input

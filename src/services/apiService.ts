@@ -2,63 +2,52 @@
 
 import conectarDB from '@/lib/mongodb'
 import CustomApi from '@/models/CustomApi'
+import { revalidatePath } from 'next/cache'
 
-// Corrigir a URL base para o endpoint correto
-const API_BASE_URL = 'https://ch-api-production.up.railway.app'
-
-// Função para buscar APIs em destaque
 export async function buscarApisDestaque() {
   try {
-    let apisExternas = []
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/apis`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        cache: 'no-store',
-        next: { revalidate: 0 }
-      })
+    // Primeiro busca as APIs customizadas do MongoDB
+    await conectarDB()
+    const apisCustomizadas = await CustomApi.find().lean()
 
-      if (!response.ok) {
-        throw new Error(`Erro ao carregar o endpoint ${API_BASE_URL}`)
-      }
+    // Depois busca as APIs externas
+    const resposta = await fetch('https://ch-api-production.up.railway.app/api/apis', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+      cache: 'no-store'
+    })
 
-      apisExternas = await response.json()
-    } catch (error) {
-      console.error('Erro ao buscar APIs externas:', error)
+    if (!resposta.ok) {
+      throw new Error('Falha ao carregar APIs externas')
     }
 
-    // Tenta conectar ao MongoDB apenas se precisar das APIs customizadas
-    let apisCustomizadas = []
-    try {
-      await conectarDB()
-      apisCustomizadas = await CustomApi.find({}).lean()
-    } catch (error) {
-      console.error('Erro ao buscar APIs customizadas:', error)
-    }
+    const apisExternas = await resposta.json()
 
-    // Retornar as APIs externas primeiro, seguidas pelas APIs customizadas
+    // Combina as duas fontes de dados
+    const todasApis = [
+      ...apisCustomizadas.map(api => ({
+        id: api._id.toString(),
+        api_name: api.api_name,
+        api_description: api.api_description,
+        is_custom: true
+      })),
+      ...apisExternas
+    ]
+
     return {
       success: true,
-      data: [
-        ...apisExternas.map(api => ({
-          api_name: api.api_name,
-          api_description: api.api_description,
-          is_custom: false
-        })),
-        ...apisCustomizadas.map(api => ({
-          id: api._id.toString(),
-          api_name: api.api_name,
-          api_description: api.api_description,
-          is_custom: true
-        }))
-      ]
+      data: todasApis
     }
-  } catch (error) {
-    console.error('Erro ao buscar APIs:', error)
-    return { success: false, data: [] }
+
+  } catch (erro) {
+    console.error('Erro ao buscar APIs:', erro)
+    return {
+      success: false,
+      data: [],
+      errorMessage: 'Falha ao carregar as APIs'
+    }
   }
 }
 
