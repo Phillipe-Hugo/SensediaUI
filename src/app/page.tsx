@@ -23,8 +23,8 @@ function Loading() {
 }
 
 async function ListaApis() {
-  // Adiciona um delay artificial de 5 segundos
-  await new Promise(resolve => setTimeout(resolve, 5000));
+
+  await new Promise(resolve => setTimeout(resolve, 15000));
 
   const resultado = await buscarApisDestaque()
 

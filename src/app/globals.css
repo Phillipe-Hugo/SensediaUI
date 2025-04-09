@@ -29,7 +29,7 @@
 }
 
 .loading-bar {
-  animation: loading 5s ease-in-out infinite;
+  animation: loading 15s ease-in-out infinite;
   transform: translateX(-100%);
   will-change: transform;
   background: linear-gradient(90deg, #6a1b9a, #9c27b0);
@@ -37,7 +37,7 @@
 }
 
 .loading-text {
-  animation: pulse 5s ease-in-out infinite;
+  animation: pulse 15s ease-in-out infinite;
   color: #6a1b9a;
   font-weight: 500;
 }
