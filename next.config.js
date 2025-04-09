@@ -14,7 +14,10 @@ const nextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb'
-    }
+    },
+    outputFileTracingExcludes: {
+      '*': ['node_modules/**'],
+    },
   },
   async headers() {
     return [
