@@ -36,9 +36,9 @@ async function ListaApis() {
         </div>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {resultado.data?.map((api) => (
+        {resultado.data?.map((api, index) => (
           <CardApi
-            key={api.id || api._id}
+            key={api.id || api._id || index} // Adicionado index como fallback
             id={api.id || api._id}
             api_name={api.api_name}
             api_description={api.api_description}

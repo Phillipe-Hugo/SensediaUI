@@ -51,27 +51,38 @@ export async function buscarApisDestaque() {
   }
 }
 
-export async function adicionarApiCustomizada(dados: { api_name: string; api_description: string }) {
+export async function adicionarApiCustomizada(dados: {
+  api_name: string;
+  api_description: string;
+}) {
   try {
     await conectarDB()
 
-    const novaApi = await CustomApi.create({
-      ...dados,
+    const novaApi = new CustomApi({
+      api_name: dados.api_name,
+      api_description: dados.api_description,
       is_custom: true
     })
+
+    const apiSalva = await novaApi.save()
+
+    revalidatePath('/')
 
     return {
       success: true,
       data: {
-        id: novaApi._id.toString(),
-        api_name: novaApi.api_name,
-        api_description: novaApi.api_description,
+        id: apiSalva._id.toString(),
+        api_name: apiSalva.api_name,
+        api_description: apiSalva.api_description,
         is_custom: true
       }
     }
   } catch (error) {
     console.error('Erro ao adicionar API:', error)
-    return { success: false }
+    return {
+      success: false,
+      errorMessage: error.message || 'Erro ao criar API'
+    }
   }
 }
 

@@ -12,28 +12,28 @@ export default function FormularioApi() {
 
   async function enviarFormulario(e: React.FormEvent) {
     e.preventDefault()
-    setCarregando(true)
+    setLoading(true)
 
     try {
       const resultado = await adicionarApiCustomizada({
-        nome_api: nome,
-        descricao_api: descricao
+        api_name: nome,
+        api_description: descricao
       })
 
-      if (resultado.sucesso) {
+      if (resultado.success) {
         setNome('')
         setDescricao('')
         window.alert('API criada com sucesso!')
-        // Forçar atualização da lista
-        window.location.reload()
+        // Usar apenas um método de atualização
+        router.refresh()
       } else {
-        throw new Error(resultado.mensagemErro || 'Falha ao criar API')
+        throw new Error(resultado.errorMessage || 'Falha ao criar API')
       }
     } catch (erro) {
       console.error('Erro no formulário:', erro)
-      window.alert(erro.message || 'Erro ao conectar com o servidor')
+      window.alert('Erro ao criar API: ' + erro.message)
     } finally {
-      setCarregando(false)
+      setLoading(false)
     }
   }
 
